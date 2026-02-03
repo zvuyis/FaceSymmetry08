@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <style>
+        body{margin:0;background:#000;overflow:hidden;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh}
+        canvas{position:absolute;left:0;top:0;width:100vw;height:100vh;object-fit:cover;display:none}
+        video{display:none}
+        #landing{position:relative;z-index:200;text-align:center;color:#fff;padding:20px}
+        #landing h1{font-size:32px;margin-bottom:10px;color:#0f0}
+        #landing p{font-size:18px;margin-bottom:30px;line-height:1.5}
+        #startBtn{padding:15px 40px;font-size:20px;border-radius:30px;border:none;background:#0f0;color:#000;font-weight:700;cursor:pointer;box-shadow:0 0 20px rgba(0,255,0,0.4)}
+        #instruction{position:absolute;top:30px;width:100%;text-align:center;color:#fff;font-size:22px;font-weight:700;text-shadow:2px 2px 4px #000;z-index:100;display:none}
+        #ui{position:absolute;bottom:20px;width:100%;display:none;flex-wrap:wrap;justify-content:center;gap:10px;z-index:100;padding:10px;box-sizing:border-box}
+        button{padding:12px 18px;border-radius:20px;border:2px solid #0f0;background:rgba(0,0,0,0.8);color:#0f0;font-weight:700}
+        button.active{background:#0f0;color:#000}
+        #recBtn.recording{border-color:red;color:red;animation:blink 1s infinite}@keyframes blink{50%{opacity:.5}}
+    </style>
+</head>
+<body>
+    <div id="landing">
+        <h1>סימטריית פנים</h1>
+        <p>גלו איך הייתם נראים אם שני צדי הפנים שלכם היו זהים לחלוטין.<br>לאחר הלחיצה, יש לאשר גישה למצלמה.</p>
+        <button id="startBtn" onclick="_0x1122()">התחלה</button>
+    </div>
+
+    <div id="instruction">1. גע בלחיים בעזרת שתי הידיים</div>
+    <video id="video" playsinline autoplay muted></video>
+    <canvas id="canvas"></canvas>
+    <div id="ui">
+        <button onclick="_0x4f12('none')" id="btnNone" class="active">רגיל</button>
+        <button onclick="_0x4f12('left')" id="btnLeft">שמאל</button>
+        <button onclick="_0x4f12('right')" id="btnRight">ימין</button>
+        <button onclick="_0x5a31()" style="border-color:#fff;color:#fff">📸 תמונה</button>
+        <button onclick="_0x2b8e()" id="recBtn" style="border-color:#ff4444;color:#ff4444">⏺ וידאו</button>
+    </div>
+
+    <script>
+        const _0x1a2b = document.getElementById('video'), _0x3c4d = document.getElementById('canvas'), _0x5e6f = _0x3c4d.getContext('2d');
+        let _0x7a8b = 'none', _0x9c0d, _0x1e2f = [], _0x3a4b = !1;
+
+        async function _0x1122() {
+            document.getElementById('landing').style.display = 'none';
+            document.getElementById('canvas').style.display = 'block';
+            document.getElementById('ui').style.display = 'flex';
+            document.getElementById('instruction').style.display = 'block';
+            await _0x5f6e();
+        }
+
+        async function _0x5f6e() {
+            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+            const _0x2d3e = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            _0x1a2b.srcObject = _0x2d3e; 
+            _0x1a2b.onloadedmetadata = () => { 
+                _0x3c4d.width = _0x1a2b.videoWidth; 
+                _0x3c4d.height = _0x1a2b.videoHeight; 
+                _0x4d5e(); 
+            };
+        }
+
+        function _0x4f12(_0x1b2c) {
+            _0x7a8b = _0x1b2c; 
+            document.querySelectorAll('#ui button').forEach(_0x5d6e => _0x5d6e.classList.remove('active'));
+            document.getElementById('btn' + _0x1b2c.charAt(0).toUpperCase() + _0x1b2c.slice(1)).classList.add('active');
+        }
+
+        async function _0x4d5e() {
+            setInterval(async () => {
+                const _0x3f4e = await faceapi.detectAllFaces(_0x1a2b, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                _0x5e6f.clearRect(0, 0, _0x3c4d.width, _0x3c4d.height);
+                if (_0x3f4e.length > 0) {
+                    const _0x1d2e = _0x3f4e[0].landmarks, _0x5b6c = _0x1d2e.getNose()[0].x, _0x4c5d = _0x1a2b.videoWidth, _0x3b4a = _0x1a2b.videoHeight;
+                    if (_0x7a8b === 'none') _0x5e6f.drawImage(_0x1a2b, 0, 0, _0x3c4d.width, _0x3c4d.height);
+                    else if (_0x7a8b === 'left') {
+                        _0x5e6f.drawImage(_0x1a2b, 0, 0, _0x5b6c, _0x3b4a, 0, 0, _0x5b6c, _0x3b4a);
+                        _0x5e6f.save(); _0x5e6f.translate(_0x5b6c * 2, 0); _0x5e6f.scale(-1, 1);
+                        _0x5e6f.drawImage(_0x1a2b, 0, 0, _0x5b6c, _0x3b4a, 0, 0, _0x5b6c, _0x3b4a); _0x5e6f.restore();
+                    } else if (_0x7a8b === 'right') {
+                        const _0x2a3b = _0x4c5d - _0x5b6c;
+                        _0x5e6f.drawImage(_0x1a2b, _0x5b6c, 0, _0x2a3b, _0x3b4a, _0x5b6c, 0, _0x2a3b, _0x3b4a);
+                        _0x5e6f.save(); _0x5e6f.translate(_0x5b6c * 2, 0); _0x5e6f.scale(-1, 1);
+                        _0x5e6f.drawImage(_0x1a2b, _0x5b6c, 0, _0x2a3b, _0x3b4a, _0x5b6c, 0, _0x2a3b, _0x3b4a); _0x5e6f.restore();
+                    }
+                } else _0x5e6f.drawImage(_0x1a2b, 0, 0, _0x3c4d.width, _0x3c4d.height);
+            }, 40);
+        }
+
+        function _0x5a31() { 
+            const _0x1c2d = document.createElement('a'); 
+            _0x1c2d.download = 'capture.png'; 
+            _0x1c2d.href = _0x3c4d.toDataURL('image/png'); 
+            _0x1c2d.click(); 
+        }
+
+        function _0x2b8e() {
+            const _0x4a5b = document.getElementById('recBtn');
+            if (!_0x3a4b) {
+                _0x1e2f = []; 
+                const _0x5c6d = _0x3c4d.captureStream(30);
+                _0x9c0d = new MediaRecorder(_0x5c6d, { mimeType: 'video/webm' });
+                _0x9c0d.ondataavailable = (_0x2b3c) => { if (_0x2b3c.data.size > 0) _0x1e2f.push(_0x2b3c.data); };
+                _0x9c0d.onstop = () => {
+                    const _0x4d5c = new Blob(_0x1e2f, { type: 'video/webm' }), _0x3e4f = URL.createObjectURL(_0x4d5c), _0x2f3a = document.createElement('a');
+                    _0x2f3a.href = _0x3e4f; _0x2f3a.download = 'video.webm'; _0x2f3a.click();
+                };
+                _0x9c0d.start(); 
+                _0x4a5b.classList.add('recording'); 
+                _0x4a5b.innerText = '⏹ עצור'; 
+                _0x3a4b = !0;
+            } else { 
+                _0x9c0d.stop(); 
+                _0x4a5b.classList.remove('recording'); 
+                _0x4a5b.innerText = '⏺ וידאו'; 
+                _0x3a4b = !1; 
+            }
+        }
+    </script>
+</body>
+</html>
